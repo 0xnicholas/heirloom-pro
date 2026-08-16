@@ -2,7 +2,7 @@
 
 Heirloom：通用自部署开源平台，对标 Palantir Foundry Ontology（数据/动作/逻辑/安全四位一体，每支柱砍到最小可用）。v1 界面 = SDK + API（TS DSL + REST/GraphQL），无 UI。
 
-本术语表由 wayfinder 图 [#1](https://github.com/0xnicholas/heirloom-pro/issues/1) 的决议维护；首个版本来自 [本体语言核心语义 #5](https://github.com/0xnicholas/heirloom-pro/issues/5)（见 [ADR-0001](docs/adr/0001-ontology-language-core-semantics.md)）。
+本术语表由 wayfinder 图 [#1](https://github.com/0xnicholas/heirloom-pro/issues/1) 的决议维护；版本来自 [本体语言核心语义 #5](https://github.com/0xnicholas/heirloom-pro/issues/5)（[ADR-0001](docs/adr/0001-ontology-language-core-semantics.md)）与[最小安全模型 #9](https://github.com/0xnicholas/heirloom-pro/issues/9)（[ADR-0004](docs/adr/0004-minimal-security-model.md)）。
 
 ## 术语
 
@@ -57,6 +57,40 @@ Heirloom：通用自部署开源平台，对标 Palantir Foundry Ontology（数�
 ### 审计日志
 
 已提交动作的只追加记录：谁、何时、以何参数、施加了哪些编辑。治理轨迹的权威源。
+
+## 安全术语（ADR-0004）
+
+### 主体
+
+被授权的实体：用户、组或服务账号。平台内置（引擎系统表，不在本体中），认证先于任何本体存在。服务账号与用户同构：有 id、可入组，语义一致。组扁平不嵌套。
+
+### 超管
+
+携带 `isAdmin` 旗的主体，绕过一切权限检查（含行级过滤）；部署时引导首个超管，后续由超管授予。权限配置失误时的救援通道。
+
+### 读授权
+
+主体 × 对象类型 ×（可选）行级谓词。无谓词 = 全类型可见；多授权 OR 并集；无任何授权 = 零行（fails-closed，不是报错）。运行时数据，由超管经管理 API 管理。
+
+### 行级谓词
+
+读授权携带的布尔表达式：查询过滤算子 + `ctx` 常量（`ctx.userId`、`ctx.groups`），编译进每个对象读取。仅限本类型属性；跨类型切分用反规范化建模。所有权、密级标记是建模模式，非机制。
+
+### 动作白名单
+
+写路径的唯一授权：主体（或组）→ 动作。行级写条件在 `execute` 内用 `ctx` 判断，不满足抛 `PermissionDenied`。行级谓词只管读面；动作内代码全量可见数据。
+
+### 权限拒绝（PermissionDenied）
+
+`execute` 内抛出的结构化异常，表示当前主体不满足该动作的行级条件；与白名单拒绝（引擎层）分属两层，与「校验失败」分属两个边界。
+
+### 静态访问令牌（PAT）
+
+v1 唯一认证凭据：服务端签发的不透明随机串，可吊销，Bearer 传递。人用户与服务账号都持有；无密码、无登录流，token 由超管签发。
+
+### 安全日志
+
+引擎内置的只追加记录：认证失败与授权拒绝（主体、动作、原因、时间戳）。与审计日志分离——审计只记已提交动作。
 
 ## 决策记录
 
