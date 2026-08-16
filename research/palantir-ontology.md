@@ -166,3 +166,12 @@ Rules "transform the parameters into Ontology edits or other effects"，分编�
 8. **完整值类型清单**：文档散落多页且部分类型受限（decimal/byte/vector），没有单一权威枚举——Heirloom 需定义自己的标量与结构类型集（喂 #5）。
 9. **链接基数/链接属性的存储语义**：文档只在 UI 配置层描述（cardinality 选项存在），链接属性是否有、怎么存未公开（喂 #5）。
 10. **Scenario/branch（what-if 模拟）**：Foundry 标注为实验性；Heirloom v1 明确不做即可，但规格应显式写为 out of scope 以防范围蔓延（喂规格大纲票）。
+
+---
+
+## 补充精读：Ontology system 页（2026-08-16，#8 会话重定向）
+
+- **写回是动作支柱的本义**："The Ontology is designed to model the full range of **actions**, from simple transactions to complex multi-step updates that must be written back to operational and edge systems in real time."——写回不是数据同步附属品，而是动作概念的核心定位；Heirloom v1 的切割线归 [#8](https://github.com/0xnicholas/heirloom-pro/issues/8)。
+- **逻辑以函数形态被动作编排**："the underlying optimizers, or abilities to call LLMs, which manifest into functions which are interactively orchestrated via actions, might have altogether different security scopes"；"Every piece of logic … can be connected to every action, within a decision graph"。——动作↔函数接缝 + 安全作用域叠加是 #8/#10/#9 的跨票决策。
+- **安全在交互时全支柱调和**："The Ontology's security system has to reconcile all of these granular policies, at the time of interaction, across tens of thousands of humans and agents"；agent 作用域「继承自人类用户或项目权限结构」。——喂 [#9](https://github.com/0xnicholas/heirloom-pro/issues/9)。
+- **引擎写架构四件套**：原子持久事务更新、批量 mutation、流、CDC 低延迟镜像——后两者已在图外（v1 单 Postgres）。
