@@ -2,7 +2,7 @@
 
 Heirloom：通用自部署开源平台，对标 Palantir Foundry Ontology（数据/动作/逻辑/安全四位一体，每支柱砍到最小可用）。v1 界面 = SDK + API（TS DSL + REST/GraphQL），无 UI。
 
-本术语表由 wayfinder 图 [#1](https://github.com/0xnicholas/heirloom-pro/issues/1) 的决议维护；版本来自 [本体语言核心语义 #5](https://github.com/0xnicholas/heirloom-pro/issues/5)（[ADR-0001](docs/adr/0001-ontology-language-core-semantics.md)）与[最小安全模型 #9](https://github.com/0xnicholas/heirloom-pro/issues/9)（[ADR-0004](docs/adr/0004-minimal-security-model.md)）。
+本术语表由 wayfinder 图 [#1](https://github.com/0xnicholas/heirloom-pro/issues/1) 的决议维护；版本来自 [本体语言核心语义 #5](https://github.com/0xnicholas/heirloom-pro/issues/5)（[ADR-0001](docs/adr/0001-ontology-language-core-semantics.md)）与[最小安全模型 #9](https://github.com/0xnicholas/heirloom-pro/issues/9)（[ADR-0004](docs/adr/0004-minimal-security-model.md)）、[数据接入与部署 #11](https://github.com/0xnicholas/heirloom-pro/issues/11)（[ADR-0005](docs/adr/0005-data-ingestion-deployment.md)）。
 
 ## 术语
 
@@ -91,6 +91,20 @@ v1 唯一认证凭据：服务端签发的不透明随机串，可吊销，Beare
 ### 安全日志
 
 引擎内置的只追加记录：认证失败与授权拒绝（主体、动作、原因、时间戳）。与审计日志分离——审计只记已提交动作。
+
+## 接入与部署术语（ADR-0005）
+
+### 接入端点
+
+管理 API 面的批量写入口：引擎写入通道的服务端暴露，批量导入的唯一服务端路径。不经动作、不受行级谓词影响（写路径本无读过滤）；调用主体为服务账号，授权由超管授予。
+
+### 导入批次
+
+审计日志的条目类型之一：一次接入端点请求落一条，记主体、时间戳、请求 id、逐类型操作计数与来源标记。不记逐对象明细。
+
+### 外部同步器
+
+保持外部系统与本体对齐的**外部进程**（模式，非平台托管插件）：以服务账号认证，写入调接入端点、增量读用水位线轮询。v1 规格只描述该模式，不提供同步器框架或接口位。
 
 ## 决策记录
 
