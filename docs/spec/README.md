@@ -13,8 +13,8 @@
 | 30 API 面 | [30-api.md](30-api.md) | ADR-0008（#10 已落：四件播要已播） | 无 | 撰写就绪 |
 | 40 存储引擎 | [40-engine.md](40-engine.md) | ADR-0002 | 无 | **已撰写** |
 | 50 安全 | [50-security.md](50-security.md) | ADR-0004 | 无 | **已撰写** |
-| 60 定义与演化 | [60-evolution.md](60-evolution.md) | ADR-0007（#6 已落：七项播要已播） | 无 | 撰写就绪 |
-| 70 接入与部署 | [70-operations.md](70-operations.md) | ADR-0005 | — | 待撰写 |
+| 60 定义与演化 | [60-evolution.md](60-evolution.md) | ADR-0007 | 无 | **已撰写** |
+| 70 接入与部署 | [70-operations.md](70-operations.md) | ADR-0005 | 无 | **已撰写** |
 | 80 验收场景 | [80-scenarios.md](80-scenarios.md) | 全部 ADR + 冻结示例本体（#14 已落：矩阵已播、S0–S11） | #6/#10（矩阵占位行回填） | 矩阵已播，叙事待撰写 |
 | 90 附录 | [90-appendix.md](90-appendix.md) | 各 ADR 散点 | — | 待撰写 |
 
