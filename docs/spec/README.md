@@ -10,7 +10,7 @@
 | 1 总架构 | [01-architecture.md](01-architecture.md) | ADR-0006 | — | 待撰写 |
 | 10 本体语言 | [10-language.md](10-language.md) | ADR-0001 + #12 | 无 | **已撰写** |
 | 20 动作 | [20-actions.md](20-actions.md) | ADR-0003 | 无 | **已撰写** |
-| 30 API 面 | [30-api.md](30-api.md) | ADR-0008（#10 已落：四件播要已播） | 无 | 撰写就绪 |
+| 30 API 面 | [30-api.md](30-api.md) | ADR-0008 + 各 ADR 移交项 | 无 | **已撰写** |
 | 40 存储引擎 | [40-engine.md](40-engine.md) | ADR-0002 | 无 | **已撰写** |
 | 50 安全 | [50-security.md](50-security.md) | ADR-0004 | 无 | **已撰写** |
 | 60 定义与演化 | [60-evolution.md](60-evolution.md) | ADR-0007 | 无 | **已撰写** |
