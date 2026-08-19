@@ -4,8 +4,8 @@
 
 | 章 | 文件 | 素材（吸收改写自） | 状态 |
 |---|---|---|---|
-| 0 概述 | [00-overview.md](00-overview.md) | 图 #16 根决策（伴侣工具/权威链不变/平台零改动） | 待撰写 |
-| 10 工作坊工作流 | [10-workshop.md](10-workshop.md) | #19（单池双道/三幕/规则树/话术/CONTEXT.md 导出） | 待撰写 |
+| 0 概述 | [00-overview.md](00-overview.md) | 图 #16 根决策（伴侣工具/权威链不变/平台零改动） | **已撰写** |
+| 10 工作坊工作流 | [10-workshop.md](10-workshop.md) | #19（单池双道/三幕/规则树/话术/CONTEXT.md 导出） | **已撰写** |
 | 20 界面 | [20-interface.md](20-interface.md) | #21 裁决 C + [research/modeling-workbench-ux](https://github.com/0xnicholas/heirloom-pro/blob/research/modeling-workbench-ux/research/modeling-workbench-ux.md)（三戒/投影） | 待撰写 |
 | 30 生成与预检 | [30-drafting.md](30-drafting.md) | #20（untracked/两层预检/同名红灯/贴回指引） | 待撰写 |
 | 40 求值通道 | [40-eval-channel.md](40-eval-channel.md) | #18 T2（bun 子进程 extractor/合并求值）+ [research/dsl-draft-generation](https://github.com/0xnicholas/heirloom-pro/blob/research/dsl-draft-generation/research/dsl-draft-generation.md) | 待撰写 |
