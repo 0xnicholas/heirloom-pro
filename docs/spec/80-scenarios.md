@@ -2,7 +2,7 @@
 
 > **范围**：示例本体（领域选型与语言构造覆盖）+ 端到端故事清单 + 覆盖矩阵（规格完整性的硬验收判据）。
 > **不含**：新语义（故事只组合既有决议）；故事正文叙事（图外撰写）。
-> **素材**：[#14 决议](https://github.com/0xnicholas/heirloom-pro/issues/14)（本文件即其落地）；示例本体冻结自 [#12 原型 `prototype/ts-dsl-shape/ontology.ts`](../../prototype/ts-dsl-shape/ontology.ts)。
+> **素材**：[#14 决议](https://github.com/0xnicholas/heirloom-pro/issues/14)（本文件即其落地）；示例本体冻结自 [#12 原型 `ontology.ts`（归档分支）](https://github.com/0xnicholas/heirloom-pro/blob/prototype/ts-dsl-shape/prototype/ts-dsl-shape/ontology.ts)。
 > **待落位**：#6、#10 决议后回填覆盖矩阵占位行。
 > **验收线**：深规格（[#13](https://github.com/0xnicholas/heirloom-pro/issues/13) 决议：逐端点表、逐条规范性陈述、示例内嵌、总表归附录）
 
@@ -13,7 +13,7 @@
 
 ## 示例本体（#14 决议：沿用冻结）
 
-规格示例本体 = [#12 原型](../../prototype/ts-dsl-shape/ontology.ts)的 HR/项目域，**冻结沿用**：Department / Employee / Skill / Project / Membership（+ Address、Money struct），动作 createDepartment / hireEmployee / grantSkill / createProject / assignToProject / transferEmployee / adjustSalary / offboardEmployee，queryFn departmentRoster / projectTeam。语言构造全覆盖：struct 复用、九类标量、数组+unique、就地约束、1:1/1:N/M:N、载荷升级中间对象、动态默认、ValidationFailed、乐观锁、无 upsert 查建两步、link 即移动、删除语义、只读函数接口位。
+规格示例本体 = [#12 原型（归档分支）](https://github.com/0xnicholas/heirloom-pro/blob/prototype/ts-dsl-shape/prototype/ts-dsl-shape/ontology.ts)的 HR/项目域，**冻结沿用**：Department / Employee / Skill / Project / Membership（+ Address、Money struct），动作 createDepartment / hireEmployee / grantSkill / createProject / assignToProject / transferEmployee / adjustSalary / offboardEmployee，queryFn departmentRoster / projectTeam。语言构造全覆盖：struct 复用、九类标量、数组+unique、就地约束、1:1/1:N/M:N、载荷升级中间对象、动态默认、ValidationFailed、乐观锁、无 upsert 查建两步、link 即移动、删除语义、只读函数接口位。
 
 - #12 若调整 DSL 外形，示例本体**同步跟进**（两票互检：外形改则本体改）。
 - 故事需要的安全面素材（主体、授权、PAT）在场景层补充，不改本体语言面。
