@@ -120,7 +120,7 @@
     "remedy": "加新属性(自动) → 一次性动作搬值 → 删旧属性，分多次 push" } ] } } }
 ```
 
-- 三档拒绝码：拒绝档 → `PUSH_REJECTED_BREAKING`；数据校验档存量不过 → `PUSH_REJECTED_DATA_VALIDATION`（均 422 + 逐变更明细，[60](60-evolution.md) §4）。
+- 三档拒绝码：拒绝档 → `PUSH_REJECTED_BREAKING`；数据校验档存量不过 → `PUSH_REJECTED_DATA_VALIDATION`（均 422 + 逐变更明细，[60](60-evolution.md) §4）；联动校验悬空引用（谓词/动作/queryFn → 被删对象）→ 422，码同拒绝档（[60](60-evolution.md) §7）。
 - 定义结构校验（命名/反向名派生冲突）在分类前先行拒绝（400 域，[60](60-evolution.md) §7）。
 
 ### 4.2 `POST /v1/admin/ingest`（接入端点编码，承 ADR-0005）

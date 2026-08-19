@@ -28,7 +28,7 @@
 | `BATCH_TOO_LARGE` | 413 | 接入批量 >1000 对象/请求 | 实际数 / 上限 | [70](70-operations.md) §2 |
 | `VALIDATION_FAILED` | 422 | 动作校验失败（逐字段）；ref 参数对象不存在（注入 miss）；查询体越限（sort/limit/include）；接入约束违例（NOT NULL/CHECK/FK） | 动作：`{field: message}` 逐字段；接入：违规条目清单；查询：越限字段与限值 | [20](20-actions.md) §4 / [30](30-api.md) §3–4 |
 | `PUSH_REJECTED_DATA_VALIDATION` | 422 | push 数据校验档存量不过，**整事务拒绝** | 逐变更明细（kind/target/violation） | [60](60-evolution.md) §4.2 |
-| `PUSH_REJECTED_BREAKING` | 422 | push 拒绝档；**出路建议必带** | 逐变更明细（kind/target/**remedy**——三通道指路） | [60](60-evolution.md) §4.3 / §5 |
+| `PUSH_REJECTED_BREAKING` | 422 | push 拒绝档；联动校验悬空引用（[60](60-evolution.md) §7）；**出路建议必带** | 逐变更明细（kind/target/**remedy**——三通道指路；悬空引用场景 remedy = 先解除引用） | [60](60-evolution.md) §4.3 / §5 |
 | `INTERNAL` | 500 | 引擎内部错误（含动作事务超时——超时即回滚，[20](20-actions.md) §6） | 事务 id（可关联日志） | [30](30-api.md) §6 |
 
 - 注记：状态码映射与专属码集承 ADR-0008；`BAD_REQUEST` / `UNAUTHENTICATED` / `ADMIN_FORBIDDEN` / `NOT_FOUND` / `LINK_RESTRICTED` / `INTERNAL` 为通用码/落码补全（收口按各章语义闭合，非新决议）；5xx 域**不属**稳定契约（客户端只应预期 `INTERNAL` 占位）。
