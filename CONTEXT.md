@@ -128,6 +128,28 @@ v1 唯一认证凭据：服务端签发的不透明随机串，可吊销，Beare
 
 类型/属性/链接携带的纯元数据：experimental / active（默认）/ deprecated。运行时零强制；删除 deprecated 仍走变更三档。
 
+## API 术语（ADR-0008）
+
+### 线上面
+
+v1 对外的唯一 HTTP 面：REST 通用端点 + TS SDK。端点集对任意本体不变（additive 演化不改 API 面）；GraphQL → v2。
+
+### 查询端点
+
+`POST /v1/objects/{type}/query`：过滤/排序（≤3 键）/keyset 游标/include（≤2 跳）走 JSON 体；响应统一 `{data, nextCursor?}`。零授权 = 200 空集（静默收窄）。
+
+### 动作/函数调用
+
+`POST /v1/actions/{apiName}/invoke` 与 `POST /v1/functions/{apiName}/invoke`：同步执行；函数是逻辑支柱 v1 唯一接口位（只读 q）。
+
+### 管理面
+
+`/v1/admin/*` 单伞：本体 push、批量接入（服务账号可调）、审计/安全日志查询、主体/组/授权四组 CRUD、PAT 签发吊销。其余 admin 端点仅超管。CLI 与端点 1:1。
+
+### 错误信封
+
+统一 `{error: {code, message, details?}}`；错误码注册表在规格附录单一权威。零行永不 403。
+
 ## 决策记录
 
 见 [docs/adr/](docs/adr/)。
