@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<!--
+  PROTOTYPE — 一次性反应物（票 #21 工作台界面外形原型）。
+  问题：这个界面能不能撑起一场投影工作坊？
+  计划：同一 URL 下三个结构迥异的变体，?variant=A|B|C 切换 + 底部浮动条 + ←/→ 键。
+  抛弃式：无持久化、无错误处理、数据全为硬编码示例（HR 域）。
+  运行：open prototype/workbench-ui/index.html （或浏览器直接打开本文件）
+-->
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<title>PROTOTYPE — 顾问建模工作台（#21）</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f4f0; color: #1a1a1a; height: 100vh; overflow: hidden; }
+  button { font-family: inherit; cursor: pointer; }
+  .chip { display: inline-block; border-radius: 999px; padding: 2px 10px; font-size: 12px; margin-left: 6px; vertical-align: middle; }
+  .chip.n { background: #dbeafe; color: #1e40af; }
+  .chip.v { background: #dcfce7; color: #166534; }
+  .chip.q { background: #f3f4f6; color: #6b7280; }
+  .lamp { display: inline-block; width: 14px; height: 14px; border-radius: 50%; margin-right: 8px; vertical-align: -2px; }
+  .lamp.g { background: #22c55e; } .lamp.y { background: #eab308; } .lamp.r { background: #ef4444; }
+  .statebar { position: fixed; top: 0; left: 0; right: 0; height: 34px; background: #1f2937; color: #e5e7eb;
+    display: flex; align-items: center; gap: 18px; padding: 0 16px; font-size: 12.5px; z-index: 50; }
+  .statebar b { color: #fbbf24; }
+  .proto-badge { background: #7c3aed; color: white; border-radius: 4px; padding: 1px 8px; font-weight: 600; letter-spacing: .5px; }
+  /* ── 浮动切换器 ── */
+  .switcher { position: fixed; bottom: 18px; left: 50%; transform: translateX(-50%); z-index: 60;
+    background: #111827; color: white; border-radius: 999px; box-shadow: 0 8px 24px rgba(0,0,0,.35);
+    display: flex; align-items: center; gap: 10px; padding: 8px 14px; user-select: none; }
+  .switcher button { background: #374151; color: white; border: none; width: 30px; height: 30px; border-radius: 50%; font-size: 15px; }
+  .switcher button:hover { background: #4b5563; }
+  .switcher .lbl { font-size: 13px; min-width: 230px; text-align: center; }
+  .switcher .lbl b { color: #fbbf24; }
+  /* ── 通用卡片 / 输入 ── */
+  .card { background: white; border: 1px solid #e5e2da; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.06); }
+  .quickadd { display: flex; gap: 8px; }
+  .quickadd input { flex: 1; border: 1.5px solid #d6d3cc; border-radius: 8px; padding: 9px 12px; font-size: 15px; font-family: inherit; }
+  .quickadd input:focus { outline: 2px solid #7c3aed; border-color: transparent; }
+  .btn { border: none; border-radius: 8px; padding: 9px 16px; font-size: 14px; background: #7c3aed; color: white; }
+  .btn.ghost { background: white; color: #374151; border: 1.5px solid #d6d3cc; }
+  pre.code { background: #0f172a; color: #e2e8f0; border-radius: 10px; padding: 14px 16px; font-size: 12.5px;
+    font-family: "SF Mono", Menlo, monospace; overflow: auto; line-height: 1.55; }
+  .dim { color: #9ca3af; font-size: 12px; }
+
+  /* ═══ 变体 A：步进三幕 ═══ */
+  .va { padding-top: 34px; height: 100vh; display: flex; flex-direction: column; }
+  .va .rail { display: flex; background: #111827; color: #9ca3af; }
+  .va .rail div { flex: 1; text-align: center; padding: 14px 0; font-size: 15px; border-bottom: 4px solid transparent; }
+  .va .rail div.on { color: white; border-bottom-color: #7c3aed; font-weight: 700; }
+  .va .stage { flex: 1; overflow: auto; display: flex; flex-direction: column; align-items: center; padding: 34px 20px 90px; }
+  .va h2 { font-size: 30px; margin-bottom: 6px; }
+  .va .sub { color: #6b7280; font-size: 15px; margin-bottom: 26px; }
+  .va .focus { width: min(860px, 96vw); }
+  .va table { width: 100%; border-collapse: collapse; font-size: 17px; background: white; border-radius: 12px; overflow: hidden; }
+  .va th { text-align: left; font-size: 13px; color: #6b7280; padding: 10px 14px; background: #faf9f6; border-bottom: 1px solid #eee; }
+  .va td { padding: 12px 14px; border-bottom: 1px solid #f3f1ec; }
+  .va select { font-size: 15px; padding: 6px 10px; border-radius: 8px; border: 1.5px solid #d6d3cc; font-family: inherit; }
+  .va .next { margin-top: 26px; display: flex; gap: 12px; }
+  .va .wizard-q { font-size: 26px; font-weight: 700; margin: 8px 0 18px; }
+  .va .opts { display: flex; flex-direction: column; gap: 12px; }
+  .va .opt { text-align: left; background: white; border: 2px solid #e5e2da; border-radius: 12px; padding: 16px 18px; font-size: 17px; }
+  .va .opt:hover { border-color: #7c3aed; }
+  .va .opt small { display: block; color: #6b7280; margin-top: 4px; font-size: 13.5px; }
+
+  /* ═══ 变体 B：工作台三区 ═══ */
+  .vb { padding-top: 34px; height: 100vh; display: grid; grid-template-columns: 300px 1fr 360px; gap: 0; }
+  .vb .col { overflow: auto; padding: 16px; }
+  .vb .col.left { border-right: 1px solid #e5e2da; }
+  .vb .col.right { border-left: 1px solid #e5e2da; background: #faf9f6; }
+  .vb h3 { font-size: 13px; color: #6b7280; letter-spacing: 1px; margin: 14px 0 8px; }
+  .vb .pool { display: flex; flex-direction: column; gap: 6px; }
+  .vb .term { background: white; border: 1px solid #e5e2da; border-radius: 9px; padding: 8px 11px; font-size: 14.5px;
+    display: flex; justify-content: space-between; align-items: center; cursor: pointer; }
+  .vb .term.sel { border: 2px solid #7c3aed; }
+  .vb .term .t { font-weight: 600; }
+  .vb .mid { display: flex; flex-direction: column; gap: 14px; }
+  .vb .qcard { padding: 20px 22px; }
+  .vb .qcard .q { font-size: 20px; font-weight: 700; margin-bottom: 14px; }
+  .vb .qcard .opts { display: flex; flex-wrap: wrap; gap: 10px; }
+  .vb .qcard .opt { background: #faf9f6; border: 2px solid #e5e2da; border-radius: 10px; padding: 12px 16px; font-size: 15px; }
+  .vb .qcard .opt:hover { border-color: #7c3aed; }
+  .vb .map { position: relative; height: 300px; }
+  .vb .draftpanel { position: fixed; top: 34px; right: 0; bottom: 0; width: 480px; background: white; z-index: 40;
+    border-left: 2px solid #7c3aed; box-shadow: -12px 0 30px rgba(0,0,0,.12); padding: 20px; overflow: auto; }
+  .vb .genbtn { margin-top: 16px; width: 100%; padding: 12px; font-size: 15px; }
+
+  /* ═══ 变体 C：画布优先 ═══ */
+  .vc { padding-top: 34px; height: 100vh; display: grid; grid-template-columns: 240px 1fr; }
+  .vc .feed { border-right: 1px solid #e5e2da; padding: 14px; overflow: auto; background: #111827; color: #e5e7eb; }
+  .vc .feed .quickadd input { background: #1f2937; color: white; border-color: #374151; }
+  .vc .feed .term { color: #e5e7eb; border-color: #374151; background: transparent; }
+  .vc .canvaswrap { position: relative; overflow: hidden; background: #faf9f6; }
+  .vc svg { width: 100%; height: 100%; }
+  .vc .node rect { fill: white; stroke: #7c3aed; stroke-width: 2; rx: 10; }
+  .vc .node text { font-size: 14px; font-weight: 600; }
+  .vc .node.new rect { stroke-dasharray: 6 3; stroke: #16a34a; }
+  .vc .drawer { position: fixed; top: 34px; right: 0; bottom: 0; width: 380px; background: white; z-index: 40;
+    border-left: 1px solid #e5e2da; box-shadow: -12px 0 30px rgba(0,0,0,.1); padding: 18px; overflow: auto; }
+  .vc .draftbar { position: fixed; left: 240px; right: 0; bottom: 0; height: 46%; background: white; z-index: 45;
+    border-top: 3px solid #7c3aed; box-shadow: 0 -12px 30px rgba(0,0,0,.12); padding: 16px 20px; overflow: auto; }
+
+  /* ── 草稿面板内容（三变体共用内容件，仅壳不同）── */
+  .draft h2 { font-size: 20px; margin-bottom: 4px; }
+  .draft .file { color: #7c3aed; font-family: Menlo, monospace; font-size: 13px; }
+  .draft .vcards { display: flex; flex-direction: column; gap: 8px; margin: 14px 0; }
+  .draft .vcard { border: 1px solid #e5e2da; border-left-width: 5px; border-radius: 8px; padding: 10px 12px; font-size: 14px; background: #fff; }
+  .draft .vcard.g { border-left-color: #22c55e; } .draft .vcard.y { border-left-color: #eab308; } .draft .vcard.r { border-left-color: #ef4444; }
+  .draft .vcard b { font-size: 14.5px; }
+  .draft .vcard .why { color: #6b7280; font-size: 12.5px; margin-top: 3px; }
+  .draft .git { margin-top: 12px; background: #f3f1ec; border-radius: 8px; padding: 10px 12px; font-family: Menlo, monospace; font-size: 12.5px; line-height: 1.7; }
+  .draft .ok { margin-top: 12px; width: 100%; padding: 12px; font-size: 15px; background: #16a34a; }
+  .draft .ok.blocked { background: #d1d5db; cursor: not-allowed; }
+</style>
+</head>
+<body>
+<div class="statebar">
+  <span class="proto-badge">PROTOTYPE #21</span>
+  <span>术语 <b id="st-terms">9</b></span><span>已判定 <b id="st-judged">6</b></span>
+  <span>链接 <b id="st-links">4</b></span><span>草稿变更 <b id="st-draft">5</b></span>
+  <span id="st-msg" style="margin-left:auto;color:#fbbf24"></span>
+</div>
+<div id="app"></div>
+<div class="switcher" id="switcher">
+  <button id="prev">◀</button>
+  <span class="lbl" id="swlbl"></span>
+  <button id="next">▶</button>
+</div>
+
+<script>
+/* ── 硬编码示例状态（HR 域，对齐归档原型的本体）── */
+const S = {
+  terms: [
+    { t: '员工', tag: '名', judged: 'object', note: '业务键：工号' },
+    { t: '部门', tag: '名', judged: 'object', note: '' },
+    { t: '技能', tag: '名', judged: 'object', note: '' },
+    { t: '地址', tag: '名', judged: 'struct', note: '嵌入员工；可复用' },
+    { t: '项目', tag: '名', judged: 'object', note: '' },
+    { t: '成员关系', tag: '待定', judged: null, note: '员工↔项目之间？' },
+    { t: '录用', tag: '动', judged: null, note: '写' },
+    { t: '调薪', tag: '动', judged: null, note: '写' },
+    { t: '花名册', tag: '动', judged: null, note: '读' },
+  ],
+  registry: ['Department', 'Employee', 'Skill'],
+  draft: {
+    file: 'ontology/hr2.ts（untracked 新文件）',
+    cards: [
+      { lamp: 'g', title: 'Employee 加可选属性 certifications: string[]', why: '自动档——加可空列，不动存量' },
+      { lamp: 'g', title: 'Employee 加 1:1 链接 mentor（自链接，reverse: mentee）', why: '自动档——加可选链接' },
+      { lamp: 'g', title: '新动作 hire-employee（参数含对象引用注入）', why: '自动档——纯新增' },
+      { lamp: 'y', title: 'Employee.email 加 unique', why: '数据校验档——存量可能有重复邮箱，push 时服务端终审' },
+      { lamp: 'r', title: '术语「员工」想改 apiName worker', why: '拒绝档——同名不是改名：重命名=删+加、数据不迁。出路：a) 换新 apiName b) 显式删+加 c) 保留原名只做允许档变更' },
+    ],
+    code: `import { objectType, action, link, prop as p } from 'heirloom';
+import { Employee } from './hr';
+
+export const Employee2 = objectType({  // ← 建议改用扩展文件导出新块
+  ...
+  certifications: p.string().array().unique(),
+});
+export const hireEmployee = action({
+  apiName: 'hire-employee',
+  params: { employeeNo: p.string().required(), /* … */ },
+  execute: (ctx, params) => { /* … */ },
+});`,
+  },
+};
+const flash = (m) => { const el = document.getElementById('st-msg'); el.textContent = m; setTimeout(() => el.textContent = '', 2600); };
+const setStat = () => {
+  document.getElementById('st-terms').textContent = S.terms.length;
+  document.getElementById('st-judged').textContent = S.terms.filter(x => x.judged).length;
+};
+function quickAddHTML() {
+  return `<div class="quickadd"><input id="qa" placeholder="快速倒词，回车入池…（如：工单）"><button class="btn" onclick="addTerm()">入池</button></div>`;
+}
+function addTerm() {
+  const el = document.getElementById('qa'); const v = el.value.trim(); if (!v) return;
+  S.terms.push({ t: v, tag: '待定', judged: null, note: '' }); el.value = ''; setStat(); flash(`已入池：${v}`);
+  renderTermPool && renderTermPool();
+}
+
+/* ── 草稿面板内容（共用内容件）── */
+function draftHTML(where) {
+  const hasRed = S.draft.cards.some(c => c.lamp === 'r');
+  return `<div class="draft">
+    <h2>草稿预览</h2><span class="file">${S.draft.file}</span>
+    <div class="vcards">${S.draft.cards.map(c => `
+      <div class="vcard ${c.lamp}">
+        <span class="lamp ${c.lamp}"></span><b>${c.title}</b>
+        <div class="why">${c.why}</div>
+      </div>`).join('')}</div>
+    <details><summary class="dim" style="cursor:pointer;margin-bottom:8px">增量代码预览（次层）</summary>
+      <pre class="code">${S.draft.code}</pre></details>
+    <div class="git">git add ontology/hr2.ts\ngit commit -m "工作坊产出：hr 域扩展"\n# 放弃：rm ontology/hr2.ts</div>
+    <button class="ok ${hasRed ? 'blocked' : ''}" ${hasRed ? 'disabled' : ''}>
+      ${hasRed ? '🔴 存在拒绝项——不可贴回' : '✅ 预检全绿——可贴回（git commit）'}</button>
+    <div class="dim" style="margin-top:8px">双层：主层=人类语言变更卡（给客户确认）；次层=代码（给顾问）。${where}</div>
+  </div>`;
+}
+
+/* ═══ 变体 A：步进三幕（投影步进式）═══ */
+function VariantA() {
+  const app = document.getElementById('app');
+  let act = 1;
+  function render() {
+    const nouns = S.terms.filter(t => t.tag !== '动');
+    const verbs = S.terms.filter(t => t.tag === '动');
+    app.innerHTML = `<div class="va">
+      <div class="rail">
+        <div class="${act === 1 ? 'on' : ''}">第一幕 · 身份判定</div>
+        <div class="${act === 2 ? 'on' : ''}">第二幕 · 链接织网</div>
+        <div class="${act === 3 ? 'on' : ''}">第三幕 · 动词判定</div>
+        <div class="${act === 4 ? 'on' : ''}">草稿预览</div>
+      </div>
+      <div class="stage">${act === 1 ? `
+        <h2>这个词，有独立身份吗？</h2><div class="sub">逐名词过堂——投影逐行判，房间一起喊</div>
+        <div class="focus">${quickAddHTML().replace('入池', '补词')}
+          <table style="margin-top:16px"><tr><th>术语</th><th>判定</th><th>备注</th></tr>
+          ${nouns.map(t => `<tr><td><b>${t.t}</b></td>
+            <td><select onchange="S.terms.find(x=>x.t==='${t.t}').judged=this.value;setStat();flash('${t.t} → '+this.value)">
+              ${['object', 'struct', '待定'].map(o => `<option ${t.judged === o ? 'selected' : ''}>${o}</option>`).join('')}</select></td>
+            <td class="dim">${t.note || '—'}</td></tr>`).join('')}</table></div>
+        <div class="next"><button class="btn" onclick="act=2;render()">下一幕：织网 →</button></div>` : ''}
+      ${act === 2 ? `
+        <h2>员工 — 部门，什么关系？</h2><div class="sub">全图织网：基数 / required / 有没有附件</div>
+        <div class="focus card" style="padding:26px">
+          <div class="wizard-q">「员工」属于「部门」，一个部门有几个员工？</div>
+          <div class="opts">
+            <button class="opt" onclick="flash('1:N——外键列；required？下一问')">一个部门多个员工（1:N）<small>最常见</small></button>
+            <button class="opt" onclick="flash('1:1——如：员工↔工卡')">恰好一个（1:1）</button>
+            <button class="opt" onclick="flash('M:N——直连还是升级？')">多对多（M:N）<small>追问：关系上要挂数据吗（角色/日期）？→ 升级中间对象</small></button>
+          </div>
+          <div class="dim" style="margin-top:14px">话术：对象引用永远走链接不走属性 · 关系带附件 = 升级成中间对象</div>
+        </div>
+        <div class="next"><button class="btn ghost" onclick="act=1;render()">← 上一幕</button><button class="btn" onclick="act=3;render()">下一幕：动词 →</button></div>` : ''}
+      ${act === 3 ? `
+        <h2>录用、调薪、花名册——各自是什么？</h2><div class="sub">动词判定：作用在哪个类型？改数据还是只读？</div>
+        <div class="focus card" style="padding:26px">
+          <div class="wizard-q">「录用」做什么？</div>
+          <div class="opts">
+            <button class="opt" onclick="flash('action——写路径；校验/权限语义提示进草稿注释')">改数据 → action<small>录用 = 建 Employee + 挂部门链接，一个事务</small></button>
+            <button class="opt" onclick="flash('queryFn——只读接口位')">只读 → queryFn<small>如：花名册</small></button>
+          </div>
+        </div>
+        <div class="next"><button class="btn ghost" onclick="act=2;render()">← 上一幕</button><button class="btn" onclick="act=4;render()">生成草稿 →</button></div>` : ''}
+      ${act === 4 ? `
+        <h2>草稿预览</h2><div class="sub">双层呈现：变更卡给客户 · 代码给顾问 · 红灯不拦你改，只拦你贴</div>
+        <div class="focus">${draftHTML('（本变体：全屏第四幕）')}</div>
+        <div class="next"><button class="btn ghost" onclick="act=3;render()">← 上一幕</button></div>` : ''}
+      </div></div>`;
+    window.act = act; window.render = render;
+    const qa = document.getElementById('qa');
+    qa && qa.addEventListener('keydown', e => { if (e.key === 'Enter') addTerm(); });
+  }
+  render();
+}
+
+/* ═══ 变体 B：工作台三区（一切常驻）═══ */
+function VariantB() {
+  const app = document.getElementById('app');
+  let sel = '员工', draftOpen = false;
+  function render() {
+    app.innerHTML = `<div class="vb">
+      <div class="col left">
+        <h3>术语池（单池双道）</h3>${quickAddHTML()}
+        <div class="pool" id="pool" style="margin-top:12px">${S.terms.map(t => `
+          <div class="term ${t.t === sel ? 'sel' : ''}" onclick="window.pick('${t.t}')">
+            <span class="t">${t.t}</span>
+            <span><span class="chip ${t.tag === '名' ? 'n' : t.tag === '动' ? 'v' : 'q'}">${t.tag}</span></span>
+          </div>`).join('')}</div>
+        <h3>判定进度</h3>
+        <div class="dim">已判 ${S.terms.filter(x => x.judged).length} / ${S.terms.length}（待定永远合法）</div>
+      </div>
+      <div class="col mid">
+        <div class="qcard card">
+          <div class="q">「${sel}」—— 它会被单独引用、查询、授权吗？<span class="dim">（删掉它业务有感觉吗？）</span></div>
+          <div class="opts">
+            <button class="opt" onclick="flash('→ object type；下一问：业务键？')">有身份 → 对象</button>
+            <button class="opt" onclick="flash('→ struct；追问：嵌进哪个宿主？复用吗？')">纯形状 → struct</button>
+            <button class="opt" onclick="flash('留在待定——不强判')">先放着（待定）</button>
+          </div>
+        </div>
+        <div class="qcard card">
+          <div class="q">链接织网：员工 — 部门</div>
+          <div class="opts">
+            <button class="opt" onclick="flash('1:N ✓ required 追问')">1:N</button>
+            <button class="opt" onclick="flash('M:N → 有附件？升级中间对象')">M:N</button>
+            <button class="opt" onclick="flash('1:1 ✓')">1:1</button>
+          </div>
+          <div class="dim" style="margin-top:10px">可回退 · 问题克制 · 结束给块摘要（#17 三戒）</div>
+        </div>
+      </div>
+      <div class="col right">
+        <h3>本体图（注册表现状 + 草稿增量）</h3>
+        <div class="map card" style="padding:10px">
+          <svg viewBox="0 0 320 280" style="width:100%">
+            <line x1="90" y1="80" x2="230" y2="80" stroke="#a78bfa" stroke-width="2"/>
+            <text x="130" y="70" font-size="11" fill="#6b7280">1:N employees</text>
+            <line x1="90" y1="95" x2="230" y2="200" stroke="#d1d5db" stroke-width="1.5" stroke-dasharray="5 4"/>
+            <g class="node"><rect x="30" y="55" width="120" height="46" rx="10"/><text x="52" y="83">Department</text></g>
+            <g class="node"><rect x="180" y="55" width="110" height="46" rx="10"/><text x="205" y="83">Employee</text></g>
+            <g class="node"><rect x="180" y="180" width="90" height="42" rx="10"/><text x="203" y="206">Skill</text></g>
+            <g class="node new"><rect x="40" y="200" width="110" height="42" rx="10"/><text x="58" y="226">M:N ⇠ 草稿</text></g>
+          </svg>
+          <div class="dim">虚线绿框 = 草稿新增（求值注册表视图，非源码文本）</div>
+        </div>
+        <h3>预检</h3>
+        <div class="dim">🟢×3 自动 · 🟡×1 数据校验 · 🔴×1 拒绝（同名≠改名）</div>
+        <button class="btn genbtn" onclick="window.openDraft()">生成草稿预览 →</button>
+      </div>
+      ${draftOpen ? `<div class="draftpanel">${draftHTML('（本变体：右侧滑出）')}<button class="btn ghost" style="margin-top:10px" onclick="window.closeDraft()">收起</button></div>` : ''}
+    </div>`;
+    window.pick = t => { sel = t; render(); };
+    window.openDraft = () => { draftOpen = true; render(); };
+    window.closeDraft = () => { draftOpen = false; render(); };
+    window.renderTermPool = render;
+    document.getElementById('qa').addEventListener('keydown', e => { if (e.key === 'Enter') addTerm(); });
+  }
+  render();
+}
+
+/* ═══ 变体 C：画布优先 ═══ */
+function VariantC() {
+  const app = document.getElementById('app');
+  let detail = 'Employee', draftOpen = false;
+  function render() {
+    app.innerHTML = `<div class="vc">
+      <div class="feed">
+        <h3 style="color:#9ca3af">词汇流（暗色副屏）</h3>
+        <div style="margin-bottom:10px">${quickAddHTML()}</div>
+        <div class="pool" id="pool" style="display:flex;flex-direction:column;gap:6px">${S.terms.map(t => `
+          <div class="term" style="border:1px solid #374151;border-radius:8px;padding:7px 10px;font-size:13.5px;display:flex;justify-content:space-between">
+            <span>${t.t}</span><span class="chip ${t.tag === '名' ? 'n' : t.tag === '动' ? 'v' : 'q'}">${t.tag}</span>
+          </div>`).join('')}</div>
+        <button class="btn" style="width:100%;margin-top:14px;background:#16a34a" onclick="window.toggleDraft()">生成草稿（底部抽屉）</button>
+      </div>
+      <div class="canvaswrap">
+        <svg viewBox="0 0 900 560">
+          <line x1="240" y1="150" x2="560" y2="150" stroke="#7c3aed" stroke-width="2.5"/>
+          <text x="360" y="138" font-size="13" fill="#6b7280">1:N employees</text>
+          <line x1="240" y1="170" x2="560" y2="330" stroke="#a78bfa" stroke-width="2" stroke-dasharray="7 4"/>
+          <text x="330" y="270" font-size="12" fill="#16a34a">M:N skills ⇠ 草稿</text>
+          <line x1="640" y1="180" x2="700" y2="330" stroke="#d1d5db" stroke-width="1.5"/>
+          <g class="node" onclick="window.sel('Employee')" style="cursor:pointer"><rect x="540" y="115" width="200" height="64" rx="12"/><text x="590" y="152" font-size="17">Employee 员工</text></g>
+          <g class="node" onclick="window.sel('Department')" style="cursor:pointer"><rect x="60" y="115" width="180" height="64" rx="12"/><text x="85" y="152" font-size="17">Department 部门</text></g>
+          <g class="node" onclick="window.sel('Skill')" style="cursor:pointer"><rect x="620" y="320" width="160" height="56" rx="12"/><text x="665" y="353" font-size="16">Skill 技能</text></g>
+          <g class="node new" onclick="window.sel('草稿块')" style="cursor:pointer"><rect x="150" y="380" width="230" height="60" rx="12"/><text x="180" y="415" font-size="15">ontology/hr2.ts ⇠ untracked</text></g>
+        </svg>
+        <div style="position:absolute;left:16px;bottom:12px" class="dim">画布=注册表派生图 · 点击节点开右侧详情 · 草稿=底部抽屉</div>
+      </div>
+      ${detail ? `<div class="drawer">
+        <h3 style="color:#6b7280;letter-spacing:1px">节点详情</h3>
+        <div style="font-size:22px;font-weight:700;margin:8px 0">${detail}</div>
+        <div class="dim" style="margin-bottom:12px">属性：employeeNo(unique) · name · status(enum) · certifications[] ⇠ 草稿</div>
+        <div class="qcard card" style="padding:16px">
+          <div style="font-weight:700;font-size:16px;margin-bottom:10px">加属性</div>
+          <div class="opts" style="display:flex;flex-wrap:wrap;gap:8px">
+            <button class="opt" style="border:1.5px solid #e5e2da;border-radius:8px;padding:9px 13px;font-size:14px;background:#faf9f6" onclick="flash('string 可选 🟢')">+ string</button>
+            <button class="opt" style="border:1.5px solid #e5e2da;border-radius:8px;padding:9px 13px;font-size:14px;background:#faf9f6" onclick="flash('decimal 🟢（钱用它）')">+ decimal</button>
+            <button class="opt" style="border:1.5px solid #e5e2da;border-radius:8px;padding:9px 13px;font-size:14px;background:#faf9f6" onclick="flash('enum 🟢')">+ enum</button>
+          </div>
+        </div>
+        <button class="btn ghost" style="margin-top:12px" onclick="window.sel(null)">关闭</button>
+      </div>` : ''}
+      ${draftOpen ? `<div class="draftbar">${draftHTML('（本变体：底部抽屉，画布仍可见）')}
+        <button class="btn ghost" style="margin-top:10px" onclick="window.toggleDraft()">收起抽屉</button></div>` : ''}
+    </div>`;
+    window.sel = n => { detail = n; render(); };
+    window.toggleDraft = () => { draftOpen = !draftOpen; render(); };
+    window.renderTermPool = render;
+    document.getElementById('qa').addEventListener('keydown', e => { if (e.key === 'Enter') addTerm(); });
+  }
+  render();
+}
+
+/* ── 切换器 ── */
+const VARIANTS = {
+  A: { name: 'A — 步进三幕（投影逐幕过堂）', render: VariantA },
+  B: { name: 'B — 工作台三区（一切常驻不打断）', render: VariantB },
+  C: { name: 'C — 画布优先（图谱即界面）', render: VariantC },
+};
+const keys = Object.keys(VARIANTS);
+function current() {
+  const v = new URLSearchParams(location.search).get('variant');
+  return keys.includes(v) ? v : 'A';
+}
+function go(v) {
+  history.replaceState(null, '', `?variant=${v}`);
+  document.getElementById('swlbl').innerHTML = `<b>${VARIANTS[v].name.split(' — ')[0]}</b>${VARIANTS[v].name.slice(1)}`;
+  VARIANTS[v].render();
+}
+document.getElementById('prev').onclick = () => go(keys[(keys.indexOf(current()) - 1 + keys.length) % keys.length]);
+document.getElementById('next').onclick = () => go(keys[(keys.indexOf(current()) + 1) % keys.length]);
+document.addEventListener('keydown', e => {
+  if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName) || document.activeElement.isContentEditable) return;
+  if (e.key === 'ArrowLeft') document.getElementById('prev').click();
+  if (e.key === 'ArrowRight') document.getElementById('next').click();
+});
+go(current());
+</script>
+</body>
+</html>
