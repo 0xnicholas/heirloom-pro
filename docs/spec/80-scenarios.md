@@ -3,7 +3,7 @@
 > **范围**：示例本体（领域选型与语言构造覆盖）+ 端到端故事清单 + 覆盖矩阵（规格完整性的硬验收判据）。
 > **不含**：新语义（故事只组合既有决议）；故事正文叙事（图外撰写）。
 > **素材**：[#14 决议](https://github.com/0xnicholas/heirloom-pro/issues/14)（本文件即其落地）；示例本体冻结自 [#12 原型 `ontology.ts`（归档分支）](https://github.com/0xnicholas/heirloom-pro/blob/prototype/ts-dsl-shape/prototype/ts-dsl-shape/ontology.ts)。
-> **待落位**：#6、#10 决议后回填覆盖矩阵占位行。
+> **待落位**：无（全部回填完毕，覆盖矩阵已闭合）。
 > **验收线**：深规格（[#13](https://github.com/0xnicholas/heirloom-pro/issues/13) 决议：逐端点表、逐条规范性陈述、示例内嵌、总表归附录）
 
 ## 规范性地位（#14 决议）
